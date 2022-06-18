@@ -104,6 +104,7 @@ class WorkshopController {
   }
   static async findWorkshopByRadius(req, res) {
     try {
+      // Distance unit in metres
       const distance = req.query.distance || 20000;
       const long = req.query.long || -6.25881;
       const lat = req.query.lat || 106.82932;
