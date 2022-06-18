@@ -2,6 +2,7 @@ const express = require("express");
 const WorkshopController = require("../controllers/workshops");
 const router = express.Router();
 
+router.get("/", WorkshopController.findWorkshopByRadius)
 router.post("/register", WorkshopController.registerWorkshop);
 router.post("/login", WorkshopController.loginWorkshop);
 router.post("/services/:WorkshopId");
