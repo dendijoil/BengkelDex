@@ -1,10 +1,10 @@
 "use strict";
 const { hashPassword, comparePassword, generateToken } = require("../helpers");
-const { Workshop, Service, sequelize } = require("../models");
+const { Workshop, Service } = require("../models");
 class WorkshopController {
   static async registerWorkshop(req, res) {
     try {
-      const { name, email, password, phoneNumber, address, longitude, latitude } = req.body;
+      const { name, email, password, phoneNumber, address, longitude = 0, latitude = 0 } = req.body;
       const workshopLocation = {
         type: "Point",
         coordinates: [longitude, latitude],
@@ -114,17 +114,15 @@ class WorkshopController {
     try {
       const { workshopId } = req.params;
       const { statusOpen } = req.body;
-      const updatedWorkshop = await Workshop.update({ statusOpen }, { where: { workshopId } });
+      await Workshop.update({ statusOpen }, { where: { id: workshopId } });
 
-      res.status(200).json(updatedWorkshop);
+      res.status(200).json({
+        message: "Success updated statusOpen",
+      });
     } catch (error) {
       res.status(500).json(error);
     }
   }
-
-  // axios("localhost:230200/workshops?long=&lat=")
-  
- 
 }
 
 module.exports = WorkshopController;

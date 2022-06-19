@@ -1,4 +1,4 @@
-const { generateToken, verifyToken } = require("../helpers/index.js");
+const { verifyToken } = require("../helpers/index.js");
 const { User } = require("../models/index");
 
 const authn = async (req, res, next) => {
