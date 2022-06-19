@@ -1,6 +1,6 @@
 "use strict";
 const { hashPassword, comparePassword, generateToken } = require("../helpers");
-const { Workshop, Service } = require("../models");
+const { Workshop, Service, User } = require("../models");
 class WorkshopController {
   static async registerWorkshop(req, res) {
     try {
@@ -119,6 +119,19 @@ class WorkshopController {
       res.status(200).json({
         message: "Success updated statusOpen",
       });
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+
+  static async getCustomersHelp(req, res) {
+    try {
+      const userHelp = await User.findAll({
+        where: {
+          statusBroadcast: true,
+        },
+      });
+      res.status(200).json(userHelp);
     } catch (error) {
       res.status(500).json(error);
     }
