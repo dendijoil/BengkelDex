@@ -124,43 +124,7 @@ class WorkshopController {
 
   // axios("localhost:230200/workshops?long=&lat=")
   
-  static async findWorkshopByRadius(req, res) {
-    try {
-      const distance = req.query.distance || 2000;
-      const long = req.query.long || -6.25881;
-      const lat = req.query.lat || 106.82932;
-
-      const result = await sequelize.query(
-        `select
-          id,
-          name,
-          location
-        from
-        "Workshops"
-          where
-            ST_DWithin(location,
-              ST_MakePoint(:lat, :long),
-              :distance,
-              true) = true;`,
-        {
-          replacements: {
-            distance: +distance,
-            long: parseFloat(long),
-            lat: parseFloat(lat),
-          },
-          logging: console.log,
-          plain: false,
-          raw: false,
-          type: sequelize.QueryTypes.SELECT,
-        }
-      );
-
-      res.status(200).json(result);
-    } catch (error) {
-      console.log(error);
-      res.status(500).json(error);
-    }
-  }
+ 
 }
 
 module.exports = WorkshopController;

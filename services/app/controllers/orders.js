@@ -3,7 +3,7 @@ const {
   Service,
   Workshop,
   sequelize,
-  // Model-nya si User tambahin sini
+  User
 } = require("../models");
 
 class OrderController {
