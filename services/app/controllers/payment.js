@@ -3,20 +3,26 @@ class PaymentController {
   static async doPayment(req, res) {
     const t = await sequelize.transaction();
     try {
-      // Tambahin transaction pengurangan saldo User
-      // Tamabhin transaction penambahan saldo Workshop
+      //! INGAT, PAKE QUERY!
+      const { WorkshopId, UserId } = req.query;
 
       const userBalance = await User.update(
-        { balance: balance - req.body.TotalPrice
-        }, 
-        { transaction: t }
-        );
+        { balance: balance - req.body.TotalPrice },
+        {
+          where: {
+            id: UserId,
+          },
+          transaction: t,
+        }
+      );
 
       const balance = await Workshop.update(
         {
           balance: balance + req.body.TotalPrice,
         },
-        { transaction: t }
+        { where: {
+          id: WorkshopId,
+        }, transaction: t }
       );
 
       const updateStatus = await Order.update(

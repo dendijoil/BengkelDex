@@ -1,9 +1,7 @@
 const {
   Order,
-  Service,
-  Workshop,
+  OrderDetail,
   sequelize,
-  User
 } = require("../models");
 
 class OrderController {
@@ -16,6 +14,7 @@ class OrderController {
 
       const newOrder = await Order.create(
         {
+          UserId: req.user.id,
           WorkshopId,
           totalPrice: 0,
           date: new Date(),
@@ -58,10 +57,28 @@ class OrderController {
     try {
       const orders = await Order.findAll({
         where: {
-          UserId: User.id, // UserID dari model User yang login
+          UserId: req.user.id, // UserID dari model User yang login
         },
       });
       res.status(200).json(orders);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+
+  static async getAllOrderDetails(req, res) {
+    try {
+      const order = await Order.findOne({
+        where: {
+          id: req.params.OrderId,
+        },
+      });
+      const orderDetails = await OrderDetail.findAll({
+        where: {
+          OrderId: Order.id,
+        },
+      });
+      res.status(200).json(orderDetails);
     } catch (error) {
       res.status(500).json(error);
     }
