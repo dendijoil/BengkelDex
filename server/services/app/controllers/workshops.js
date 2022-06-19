@@ -40,11 +40,30 @@ class WorkshopController {
         if (isPasswordCorrect) {
           const token = generateToken({
             id: workshop.id,
+            name: workshop.name,
             email: workshop.email,
+            balance: workshop.balance,
+            address: workshop.address,
+            phoneNumber: workshop.phoneNumber,
+            statusOpen: workshop.statusOpen,
+            location: workshop.location,
             role: workshop.role,
           });
+
+          const payload = {
+            id: workshop.id,
+            name: workshop.name,
+            email: workshop.email,
+            balance: workshop.balance,
+            address: workshop.address,
+            phoneNumber: workshop.phoneNumber,
+            statusOpen: workshop.statusOpen,
+            location: workshop.location,
+          };
+
           res.status(200).json({
             token,
+            payload,
           });
         } else {
           res.status(401).json({ message: "Invalid username/password" });
@@ -102,9 +121,12 @@ class WorkshopController {
       res.status(500).json(error);
     }
   }
+
+  // axios("localhost:230200/workshops?long=&lat=")
+  
   static async findWorkshopByRadius(req, res) {
     try {
-      const distance = req.query.distance || 20000;
+      const distance = req.query.distance || 2000;
       const long = req.query.long || -6.25881;
       const lat = req.query.lat || 106.82932;
 
@@ -135,7 +157,7 @@ class WorkshopController {
 
       res.status(200).json(result);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       res.status(500).json(error);
     }
   }
