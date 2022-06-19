@@ -1,0 +1,38 @@
+[
+    {
+      "id": 1,
+      "name": "Leanne Graham",
+      "username": "Leanne",
+      "password": "123456",
+      "role": "customer",
+      "email": "Leanne@email.com",
+      "balance": 120000,
+      "statusBroadcast": false,
+      "address": "Bodjong Kenyot",
+      "location": [0, 0]
+    },
+    {
+      "id": 2,
+      "name":"Ervin Howell",
+      "username": "Ervin",
+      "password": "123456",
+      "role": "costumer",
+      "email": "Ervin@email.com",
+      "balance": 120000,
+      "statusBroadcast": false,
+      "address": "Bodjong Kenyot",
+      "location": [0, 0]
+    },
+    {
+      "id": 2,
+      "name": "Markus Doe",
+      "username": "Markus",
+      "password": "123456",
+      "role": "costumer",
+      "email": "user2@email.com",
+      "balance": 120000,
+      "statusBroadcast": false,
+      "address": "Bodjong Kenyot",
+      "location": [0, 0]
+    }
+  ]
