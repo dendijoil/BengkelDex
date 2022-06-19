@@ -13,7 +13,7 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
      */
-    const workshops = require("../../../workshops.json");
+    const workshops = require("../data/workshops.json");
     workshops.forEach((el) => {
       delete el.id;
       el.password = hashPassword(el.password);

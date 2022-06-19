@@ -4,7 +4,7 @@ const { hashPassword, comparePassword, generateToken } = require("../helpers");
 class CostumerController {
   static async register(req, res) {
     try {
-      let role = "costumer";
+      let role = "customer";
       let statusBroadcast = false;
       let balance = 0;
       let userLocation = {
@@ -12,7 +12,6 @@ class CostumerController {
         coordinates: [0, 0],
       };
       const { name, username, email, password, address } = req.body;
-      console.log(name, username, email, password, address);
       const user = await User.create({
         name,
         username,
@@ -77,11 +76,72 @@ class CostumerController {
           message: "User not found",
         });
       }
+
     } catch (error) {
       res.status(500).json({
         message: "Internal server error",
         error: error.message,
       });
+    }
+  }
+
+  static async updateBroadcast(req, res) {
+    try {
+        const id = req.user.id
+        let status = req.body.status
+        const broadcast = await User.update({
+            statusBroadcast: status
+        }, {
+            where: {
+                id: id
+            }
+        })
+        res.status(201).json({
+            message: "broadcast updated",
+        })
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }
+
+  static async findWorkshopByRadius(req, res) {
+    try {
+      const distance = req.query.distance || 2000;
+      const long = req.query.long || -6.25881;
+      const lat = req.query.lat || 106.82932;
+
+      const result = await sequelize.query(
+        `select
+          id,
+          name,
+          location
+        from
+        "Workshops"
+          where
+            ST_DWithin(location,
+              ST_MakePoint(:lat, :long),
+              :distance,
+              true) = true;`,
+        {
+          replacements: {
+            distance: +distance,
+            long: parseFloat(long),
+            lat: parseFloat(lat),
+          },
+          logging: console.log,
+          plain: false,
+          raw: false,
+          type: sequelize.QueryTypes.SELECT,
+        }
+      );
+
+      res.status(200).json(result);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json(error);
     }
   }
 }

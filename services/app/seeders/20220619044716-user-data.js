@@ -4,7 +4,7 @@ const { hashPassword } = require("../helpers/index");
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    const Users = require("../data/users.json");
+    const Users = require("../data/customers.json");
     Users.forEach((el) => {
       delete el.id;
       el.password = hashPassword(el.password);
