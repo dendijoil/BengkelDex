@@ -4,8 +4,9 @@ const router = express.Router();
 
 router.post("/register", WorkshopController.registerWorkshop);
 router.post("/login", WorkshopController.loginWorkshop);
-router.post("/services/:WorkshopId");
+router.post("/services/:WorkshopId", WorkshopController.postServices);
 router.get("/services/:WorkshopId", WorkshopController.getWorkshopServices);
+router.get("need-help", WorkshopController.getCustomersHelp);
 router.patch("/:workshopId", WorkshopController.updateStatus);
 
 module.exports = router;
