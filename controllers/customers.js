@@ -106,9 +106,7 @@ class CustomerController {
 
       const result = await sequelize.query(
         `select
-          id,
-          name,
-          location
+          *
         from
         "Workshops"
           where
@@ -129,9 +127,10 @@ class CustomerController {
           type: sequelize.QueryTypes.SELECT,
         }
       );
-      result.forEach(el => {
+      result.forEach((el) => {
         el.TalkJSID = `W-${el.id}`;
-      })
+        delete el.password;
+      });
       res.status(200).json(result);
     } catch (error) {
       next(error);
