@@ -58,6 +58,7 @@ class CustomerController {
         email: user.email,
         balance: user.balance,
         address: user.address,
+        role: user.role,
         statusOpen: user.statusOpen,
         imgUrl: user.imgUrl,
         TalkJSID: `C-${user.id}`,
