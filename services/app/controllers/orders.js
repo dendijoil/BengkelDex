@@ -1,70 +1,81 @@
-const { Order, OrderDetail, sequelize } = require("../models");
+const { Order, OrderDetail, sequelize, Service, User } = require("../models");
+const { Op } = require("sequelize");
 
 class OrderController {
-  static async createOrder(req, res) {
-    // const t = await sequelize.transaction();
+  static async createOrder(req, res, next) {
+    const t = await sequelize.transaction();
     try {
       const { WorkshopId } = req.params;
 
-      const { services, username } = req.body;
-      services.map((el) => {
-        el = JSON.stringify(el);
-        el = JSON.parse(el);
-        return el
-      })
-      // const stringfied = JSON.stringify(services[0])
-      console.log(services)
-      // console.log(services[0], username);
+      const { services, username, paymentType } = req.body;
 
-      // const newOrder = await Order.create(
-      //   {
-      //     UserId: username,
-      //     WorkshopId,
-      //     totalPrice: 0,
-      //     date: new Date(),
-      //     paymentStatus: false,
-      //     paymentType,
-      //   },
-      //   { transaction: t }
-      // );
-      // let totalPrice;
-      // services.forEach(
-      //   async (el) => {
-      //     const newOrderDetail = await OrderDetail.create({
-      //       OrderId: newOrder.id,
-      //       ServiceId: el.id,
-      //       price: el.price,
-      //     });
-      //     totalPrice += newServices.price;
-      //   },
-      //   { transaction: t }
-      // );
+      const user = await User.findOne(
+        {
+          where: {
+            username,
+          },
+        },
+        { transaction: t }
+      );
 
-      // const finalOrder = await Order.update(
-      //   {
-      //     totalPrice,
-      //   },
-      //   {
-      //     where: {
-      //       id: newOrder.id,
-      //     },
-      //     transaction: t,
-      //   }
-      // );
+      const newOrder = await Order.create(
+        {
+          UserId: user.id,
+          WorkshopId,
+          totalPrice: 0,
+          date: new Date(),
+          paymentStatus: false,
+          paymentType,
+        },
+        { transaction: t }
+      );
+      let totalPrice = 0;
 
-      // await t.commit();
+      const selectedServices = await Service.findAll(
+        {
+          where: {
+            id: { [Op.or]: services },
+          },
+        },
+        { transaction: t }
+      );
+
+      console.log(selectedServices);
+      let orderDetail = [];
+
+      selectedServices.forEach((service) => {
+        orderDetail.push({
+          OrderId: newOrder.id,
+          ServiceId: service.id,
+          price: service.price,
+        });
+        totalPrice += service.price;
+      });
+      await OrderDetail.bulkCreate(orderDetail, { transaction: t });
+      const finalOrder = await Order.update(
+        {
+          totalPrice,
+        },
+        {
+          where: {
+            id: newOrder.id,
+          },
+          transaction: t,
+        }
+      );
+
+      await t.commit();
 
       res.status(201).json({
         message: "Success",
       });
     } catch (error) {
-      // t.rollback();
-      console.log(error)
-      res.status(500).json(error);
+      t.rollback();
+      next(error);
     }
   }
 
-  static async getAllOrders(req, res) {
+  static async getAllOrders(req, res, next) {
     try {
       const orders = await Order.findAll({
         where: {
@@ -73,11 +84,11 @@ class OrderController {
       });
       res.status(200).json(orders);
     } catch (error) {
-      res.status(500).json(error);
+      next(error);
     }
   }
 
-  static async getAllOrderDetails(req, res) {
+  static async getAllOrderDetails(req, res, next) {
     try {
       const order = await Order.findOne({
         where: {
@@ -91,7 +102,7 @@ class OrderController {
       });
       res.status(200).json(orderDetails);
     } catch (error) {
-      res.status(500).json(error);
+      next(error);
     }
   }
 }

@@ -2,7 +2,7 @@
 const { hashPassword, comparePassword, generateToken } = require("../helpers");
 const { Workshop, Service, User } = require("../models");
 class WorkshopController {
-  static async registerWorkshop(req, res) {
+  static async registerWorkshop(req, res, next) {
     try {
       const { name, email, password, phoneNumber, address, longitude = 0, latitude = 0 } = req.body;
       const workshopLocation = {
@@ -30,7 +30,7 @@ class WorkshopController {
     }
   }
 
-  static async loginWorkshop(req, res) {
+  static async loginWorkshop(req, res, next) {
     try {
       const { email, password } = req.body;
       const workshop = await Workshop.findOne({ where: { email } });
@@ -72,11 +72,11 @@ class WorkshopController {
         res.status(404).json({ message: "Workshop not found" });
       }
     } catch (error) {
-      res.status(500).json(error);
+      next(error);
     }
   }
 
-  static async getWorkshopServices(req, res) {
+  static async getWorkshopServices(req, res, next) {
     try {
       const { WorkshopId } = req.params;
       const workshop = await Workshop.findOne({ where: { WorkshopId } });
@@ -84,11 +84,11 @@ class WorkshopController {
 
       res.status(200).json(services);
     } catch (error) {
-      res.status(500).json(error);
+      next(error);
     }
   }
 
-  static async postServices(req, res) {
+  static async postServices(req, res, next) {
     try {
       const { WorkshopId } = req.params;
       const { name, description, price, isPromo } = req.body;
@@ -108,11 +108,11 @@ class WorkshopController {
         isPromo: newService.isPromo,
       });
     } catch (error) {
-      res.status(500).json(error);
+      next(error);
     }
   }
 
-  static async updateStatus(req, res) {
+  static async updateStatus(req, res, next) {
     try {
       const { workshopId } = req.params;
       const { statusOpen } = req.body;
@@ -122,11 +122,11 @@ class WorkshopController {
         message: "Success updated statusOpen",
       });
     } catch (error) {
-      res.status(500).json(error);
+      next(error);
     }
   }
 
-  static async getCustomersHelp(req, res) {
+  static async getCustomersHelp(req, res, next) {
     try {
       const userHelp = await User.findAll({
         where: {
@@ -135,7 +135,7 @@ class WorkshopController {
       });
       res.status(200).json(userHelp);
     } catch (error) {
-      res.status(500).json(error);
+      next(error);
     }
   }
 }

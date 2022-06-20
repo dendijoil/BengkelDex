@@ -2,7 +2,7 @@
 const { User } = require("../models/index");
 const { hashPassword, comparePassword, generateToken } = require("../helpers");
 class CustomerController {
-  static async register(req, res) {
+  static async register(req, res, next) {
     try {
       let role = "customer";
       let statusBroadcast = false;
@@ -29,14 +29,11 @@ class CustomerController {
         balance: user.balance,
       });
     } catch (error) {
-      res.status(500).json({
-        message: "Internal server error",
-        error: error.message,
-      });
+      next(error);
     }
   }
 
-  static async loginCustomer(req, res) {
+  static async loginCustomer(req, res, next) {
     try {
       const { email, password } = req.body;
       const user = await User.findOne({ where: { email } });
@@ -77,38 +74,34 @@ class CustomerController {
           message: "User not found",
         });
       }
-
     } catch (error) {
-      res.status(500).json({
-        message: "Internal server error",
-        error: error.message,
-      });
+      next(error);
     }
   }
 
-  static async updateBroadcast(req, res) {
+  static async updateBroadcast(req, res, next) {
     try {
-        const id = req.user.id
-        let status = req.body.status
-        const broadcast = await User.update({
-            statusBroadcast: status
-        }, {
-            where: {
-                id: id
-            }
-        })
-        res.status(201).json({
-            message: "broadcast updated",
-        })
-    } catch (error) {
-      res.status(500).json({
-        message: "Internal server error",
-        error: error.message,
+      const id = req.user.id;
+      let status = req.body.status;
+      const broadcast = await User.update(
+        {
+          statusBroadcast: status,
+        },
+        {
+          where: {
+            id: id,
+          },
+        }
+      );
+      res.status(201).json({
+        message: "broadcast updated",
       });
+    } catch (error) {
+      next(error);
     }
   }
 
-  static async findWorkshopByRadius(req, res) {
+  static async findWorkshopByRadius(req, res, next) {
     try {
       const distance = req.query.distance || 2000;
       const long = req.query.long || -6.25881;
@@ -141,8 +134,7 @@ class CustomerController {
 
       res.status(200).json(result);
     } catch (error) {
-      console.log(error);
-      res.status(500).json(error);
+      next(error);
     }
   }
 }

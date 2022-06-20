@@ -1,6 +1,6 @@
 const { Order, Workshop, User, sequelize } = require("../models");
 class PaymentController {
-  static async doPayment(req, res) {
+  static async doPayment(req, res, next) {
     const t = await sequelize.transaction();
     try {
       //! INGAT, PAKE QUERY!
@@ -20,9 +20,12 @@ class PaymentController {
         {
           balance: balance + req.body.TotalPrice,
         },
-        { where: {
-          id: WorkshopId,
-        }, transaction: t }
+        {
+          where: {
+            id: WorkshopId,
+          },
+          transaction: t,
+        }
       );
 
       const updateStatus = await Order.update(
@@ -43,6 +46,7 @@ class PaymentController {
       });
     } catch (error) {
       t.rollback();
+      next(error);
     }
   }
 }
