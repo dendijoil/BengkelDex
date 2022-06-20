@@ -62,6 +62,7 @@ class WorkshopController {
         balance: workshop.balance,
         address: workshop.address,
         phoneNumber: workshop.phoneNumber,
+        role: workshop.role,
         statusOpen: workshop.statusOpen,
         location: workshop.location,
         imgUrl: workshop.imgUrl,
@@ -183,6 +184,7 @@ class WorkshopController {
           },
         ],
       });
+      workshop.dataValues.TalkJSID = `W-${workshop.id}`;
       res.status(200).json(workshop);
     } catch (error) {
       next(error);
