@@ -26,7 +26,7 @@ class WorkshopController {
         balance: newWorkshop.balance,
       });
     } catch (error) {
-      res.status(500).json(error);
+      next(error);
     }
   }
 
@@ -34,8 +34,14 @@ class WorkshopController {
     try {
       const { email, password } = req.body;
       const workshop = await Workshop.findOne({ where: { email } });
+      if (!workshop) {
+        throw { name: "UserNotFound" };
+      }
       if (workshop) {
         const isPasswordCorrect = comparePassword(password, workshop.password);
+        if (!isPasswordCorrect) {
+          throw { name: "WrongPassword" };
+        }
         if (isPasswordCorrect) {
           const token = generateToken({
             id: workshop.id,
@@ -65,8 +71,6 @@ class WorkshopController {
             token,
             payload,
           });
-        } else {
-          res.status(401).json({ message: "Invalid username/password" });
         }
       } else {
         res.status(404).json({ message: "Workshop not found" });

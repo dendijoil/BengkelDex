@@ -24,9 +24,7 @@ class CustomerController {
         location: userLocation,
       });
       res.status(201).json({
-        name: user.name,
-        email: user.email,
-        balance: user.balance,
+        message: "success create user",
       });
     } catch (error) {
       next(error);
@@ -37,9 +35,16 @@ class CustomerController {
     try {
       const { email, password } = req.body;
       const user = await User.findOne({ where: { email } });
-
+      if (!user) {
+        throw { name: "UserNotFound" };
+      }
       if (user) {
         const isPasswordCorrect = comparePassword(password, user.password);
+
+        if (!isPasswordCorrect) {
+          throw { name: "WrongPassword" };
+        }
+
         if (isPasswordCorrect) {
           const token = generateToken({
             id: user.id,
@@ -64,15 +69,7 @@ class CustomerController {
             token,
             payload,
           });
-        } else {
-          res.status(401).json({
-            message: "Password is incorrect",
-          });
         }
-      } else {
-        res.status(404).json({
-          message: "User not found",
-        });
       }
     } catch (error) {
       next(error);
