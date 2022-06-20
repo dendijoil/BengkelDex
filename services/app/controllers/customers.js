@@ -1,8 +1,8 @@
 "use strict";
 const { User } = require("../models/index");
 const { hashPassword, comparePassword, generateToken } = require("../helpers");
-class CostumerController {
-  static async register(req, res) {
+class CustomerController {
+  static async register(req, res, next) {
     try {
       let role = "customer";
       let statusBroadcast = false;
@@ -24,25 +24,27 @@ class CostumerController {
         location: userLocation,
       });
       res.status(201).json({
-        name: user.name,
-        email: user.email,
-        balance: user.balance,
+        message: "success create user",
       });
     } catch (error) {
-      res.status(500).json({
-        message: "Internal server error",
-        error: error.message,
-      });
+      next(error);
     }
   }
 
-  static async loginCustumer(req, res) {
+  static async loginCustomer(req, res, next) {
     try {
       const { email, password } = req.body;
       const user = await User.findOne({ where: { email } });
-
+      if (!user) {
+        throw { name: "UserNotFound" };
+      }
       if (user) {
         const isPasswordCorrect = comparePassword(password, user.password);
+
+        if (!isPasswordCorrect) {
+          throw { name: "WrongPassword" };
+        }
+
         if (isPasswordCorrect) {
           const token = generateToken({
             id: user.id,
@@ -66,48 +68,36 @@ class CostumerController {
             token,
             payload,
           });
-        } else {
-          res.status(401).json({
-            message: "Password is incorrect",
-          });
         }
-      } else {
-        res.status(404).json({
-          message: "User not found",
-        });
       }
-
     } catch (error) {
-      res.status(500).json({
-        message: "Internal server error",
-        error: error.message,
-      });
+      next(error);
     }
   }
 
-  static async updateBroadcast(req, res) {
+  static async updateBroadcast(req, res, next) {
     try {
-        const id = req.user.id
-        let status = req.body.status
-        const broadcast = await User.update({
-            statusBroadcast: status
-        }, {
-            where: {
-                id: id
-            }
-        })
-        res.status(201).json({
-            message: "broadcast updated",
-        })
-    } catch (error) {
-      res.status(500).json({
-        message: "Internal server error",
-        error: error.message,
+      const id = req.user.id;
+      let status = req.body.status;
+      const broadcast = await User.update(
+        {
+          statusBroadcast: status,
+        },
+        {
+          where: {
+            id: id,
+          },
+        }
+      );
+      res.status(201).json({
+        message: "broadcast updated",
       });
+    } catch (error) {
+      next(error);
     }
   }
 
-  static async findWorkshopByRadius(req, res) {
+  static async findWorkshopByRadius(req, res, next) {
     try {
       const distance = req.query.distance || 2000;
       const long = req.query.long || -6.25881;
@@ -140,10 +130,9 @@ class CostumerController {
 
       res.status(200).json(result);
     } catch (error) {
-      console.log(error);
-      res.status(500).json(error);
+      next(error);
     }
   }
 }
 
-module.exports = CostumerController;
+module.exports = CustomerController;
