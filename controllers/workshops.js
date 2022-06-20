@@ -172,14 +172,14 @@ class WorkshopController {
     try {
       const { workshopId } = req.params;
       const workshop = await Workshop.findOne({
+        attributes: { exclude: ["password"] },
         where: {
           id: workshopId,
         },
         include: [
           {
             model: Service,
-            as: "services",
-            attributes: ["id", "name", "description", "price", "isPromo"],
+            attributes: ["id", "name", "price", "isPromo"],
           },
         ],
       });
