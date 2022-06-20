@@ -135,9 +135,7 @@ class WorkshopController {
 
       const result = await sequelize.query(
         `select
-          id,
-          name,
-          location
+          *
         from
         "Users"
           where
@@ -159,9 +157,10 @@ class WorkshopController {
         }
       );
 
-      result.forEach(el => {
+      result.forEach((el) => {
         el.TalkJSID = `C-${el.id}`;
-      })
+        delete el.password;
+      });
 
       res.status(200).json(result);
     } catch (error) {
