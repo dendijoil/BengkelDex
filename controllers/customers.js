@@ -1,12 +1,10 @@
 "use strict";
+const { sequelize } = require("../models");
 const { User } = require("../models/index");
 const { hashPassword, comparePassword, generateToken } = require("../helpers");
 class CustomerController {
   static async register(req, res, next) {
     try {
-      let role = "customer";
-      let statusBroadcast = false;
-      let balance = 0;
       let userLocation = {
         type: "Point",
         coordinates: [0, 0],
@@ -16,10 +14,10 @@ class CustomerController {
         name,
         username,
         email,
-        password: hashPassword(password),
-        role,
-        balance,
-        statusBroadcast,
+        password,
+        role: "customer",
+        balance: 0,
+        statusBroadcast: false,
         address,
         location: userLocation,
       });
@@ -36,41 +34,37 @@ class CustomerController {
       const { email, password } = req.body;
       const user = await User.findOne({ where: { email } });
       if (!user) {
-        throw { name: "UserNotFound" };
+        throw { name: "WrongPassword" };
       }
-      if (user) {
-        const isPasswordCorrect = comparePassword(password, user.password);
 
-        if (!isPasswordCorrect) {
-          throw { name: "WrongPassword" };
-        }
+      const isPasswordCorrect = comparePassword(password, user.password);
 
-        if (isPasswordCorrect) {
-          const token = generateToken({
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            balance: user.balance,
-            address: user.address,
-            location: user.location,
-            role: user.role,
-          });
-          const payload = {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            balance: user.balance,
-            address: user.address,
-            phoneNumber: user.phoneNumber,
-            statusOpen: user.statusOpen,
-            TalkJSID: `C-${user.id}`,
-          };
-          res.status(200).json({
-            token,
-            payload,
-          });
-        }
+      if (!isPasswordCorrect) {
+        throw { name: "WrongPassword" };
       }
+
+      const token = generateToken({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        balance: user.balance,
+        address: user.address,
+        location: user.location,
+        role: user.role,
+      });
+      const payload = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        balance: user.balance,
+        address: user.address,
+        statusOpen: user.statusOpen,
+        TalkJSID: `C-${user.id}`,
+      };
+      res.status(200).json({
+        token,
+        payload,
+      });
     } catch (error) {
       next(error);
     }
@@ -79,10 +73,15 @@ class CustomerController {
   static async updateBroadcast(req, res, next) {
     try {
       const id = req.user.id;
-      let status = req.body.status;
+      let { status, latitude, longitude } = req.body;
+      const userLocation = {
+        type: "Point",
+        coordinates: [longitude, latitude],
+      };
       const broadcast = await User.update(
         {
           statusBroadcast: status,
+          location: userLocation,
         },
         {
           where: {
@@ -115,7 +114,8 @@ class CustomerController {
             ST_DWithin(location,
               ST_MakePoint(:lat, :long),
               :distance,
-              true) = true;`,
+              true) = true
+              and "statusOpen" = true;`,
         {
           replacements: {
             distance: +distance,

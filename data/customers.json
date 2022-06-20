@@ -4,11 +4,13 @@
       "name": "Leanne Graham",
       "username": "leanne",
       "password": "123456",
+      "imgUrl": "https://randomuser.me/api/portraits/men/70.jpg",
       "role": "customer",
       "email": "leanne@email.com",
       "balance": 120000,
       "statusBroadcast": false,
       "address": "Bodjong Kenyot",
+      "phoneNumber": "0812345678",
       "location": [0, 0]
     },
     {
@@ -16,23 +18,27 @@
       "name":"Ervin Howell",
       "username": "ervin",
       "password": "123456",
+      "imgUrl": "https://randomuser.me/api/portraits/men/79.jpg",
       "role": "customer",
       "email": "ervin@email.com",
       "balance": 120000,
       "statusBroadcast": false,
       "address": "Bodjong Kenyot",
+      "phoneNumber": "08123489472",
       "location": [0, 0]
     },
     {
-      "id": 2,
+      "id": 3,
       "name": "Markus Doe",
       "username": "markus",
       "password": "123456",
+      "imgUrl": "https://randomuser.me/api/portraits/men/58.jpg",
       "role": "customer",
       "email": "markus@gmail.com",
       "balance": 120000,
       "statusBroadcast": false,
       "address": "Bodjong Kenyot",
+      "phoneNumber": "081234873647",
       "location": [0, 0]
     }
   ]

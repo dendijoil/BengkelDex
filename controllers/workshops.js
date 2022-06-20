@@ -1,6 +1,6 @@
 "use strict";
 const { hashPassword, comparePassword, generateToken } = require("../helpers");
-const { Workshop, Service, User } = require("../models");
+const { Workshop, Service, User, sequelize } = require("../models");
 class WorkshopController {
   static async registerWorkshop(req, res, next) {
     try {
@@ -35,46 +35,42 @@ class WorkshopController {
       const { email, password } = req.body;
       const workshop = await Workshop.findOne({ where: { email } });
       if (!workshop) {
-        throw { name: "UserNotFound" };
+        throw { name: "WrongPassword" };
       }
-      if (workshop) {
-        const isPasswordCorrect = comparePassword(password, workshop.password);
-        if (!isPasswordCorrect) {
-          throw { name: "WrongPassword" };
-        }
-        if (isPasswordCorrect) {
-          const token = generateToken({
-            id: workshop.id,
-            name: workshop.name,
-            email: workshop.email,
-            balance: workshop.balance,
-            address: workshop.address,
-            phoneNumber: workshop.phoneNumber,
-            statusOpen: workshop.statusOpen,
-            location: workshop.location,
-            role: workshop.role,
-          });
 
-          const payload = {
-            id: workshop.id,
-            name: workshop.name,
-            email: workshop.email,
-            balance: workshop.balance,
-            address: workshop.address,
-            phoneNumber: workshop.phoneNumber,
-            statusOpen: workshop.statusOpen,
-            location: workshop.location,
-            TalkJSID: `W-${workshop.id}`,
-          };
-
-          res.status(200).json({
-            token,
-            payload,
-          });
-        }
-      } else {
-        res.status(404).json({ message: "Workshop not found" });
+      const isPasswordCorrect = comparePassword(password, workshop.password);
+      if (!isPasswordCorrect) {
+        throw { name: "WrongPassword" };
       }
+
+      const token = generateToken({
+        id: workshop.id,
+        name: workshop.name,
+        email: workshop.email,
+        balance: workshop.balance,
+        address: workshop.address,
+        phoneNumber: workshop.phoneNumber,
+        statusOpen: workshop.statusOpen,
+        location: workshop.location,
+        role: workshop.role,
+      });
+
+      const payload = {
+        id: workshop.id,
+        name: workshop.name,
+        email: workshop.email,
+        balance: workshop.balance,
+        address: workshop.address,
+        phoneNumber: workshop.phoneNumber,
+        statusOpen: workshop.statusOpen,
+        location: workshop.location,
+        TalkJSID: `W-${workshop.id}`,
+      };
+
+      res.status(200).json({
+        token,
+        payload,
+      });
     } catch (error) {
       next(error);
     }
@@ -123,7 +119,7 @@ class WorkshopController {
       await Workshop.update({ statusOpen }, { where: { id: workshopId } });
 
       res.status(200).json({
-        message: "Success updated statusOpen",
+        message: "Success updated status",
       });
     } catch (error) {
       next(error);
@@ -132,12 +128,37 @@ class WorkshopController {
 
   static async getCustomersHelp(req, res, next) {
     try {
-      const userHelp = await User.findAll({
-        where: {
-          statusBroadcast: true,
-        },
-      });
-      res.status(200).json(userHelp);
+      const distance = req.query.distance || 100000;
+      const long = req.query.long || -6.25881;
+      const lat = req.query.lat || 106.82932;
+
+      const result = await sequelize.query(
+        `select
+          id,
+          name,
+          location
+        from
+        "Users"
+          where
+            ST_DWithin(location,
+              ST_MakePoint(:lat, :long),
+              :distance,
+              true) = true
+            and "statusBroadcast" = true;`,
+        {
+          replacements: {
+            distance: +distance,
+            long: parseFloat(long),
+            lat: parseFloat(lat),
+          },
+          logging: console.log,
+          plain: false,
+          raw: false,
+          type: sequelize.QueryTypes.SELECT,
+        }
+      );
+
+      res.status(200).json(result);
     } catch (error) {
       next(error);
     }

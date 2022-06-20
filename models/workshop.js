@@ -47,6 +47,7 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       },
+      imgUrl: DataTypes.STRING,
       statusOpen: DataTypes.BOOLEAN,
       phoneNumber: DataTypes.STRING,
       address: DataTypes.STRING,
