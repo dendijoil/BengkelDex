@@ -1,7 +1,7 @@
 "use strict";
 const { User } = require("../models/index");
 const { hashPassword, comparePassword, generateToken } = require("../helpers");
-class CostumerController {
+class CustomerController {
   static async register(req, res) {
     try {
       let role = "customer";
@@ -36,7 +36,7 @@ class CostumerController {
     }
   }
 
-  static async loginCustumer(req, res) {
+  static async loginCustomer(req, res) {
     try {
       const { email, password } = req.body;
       const user = await User.findOne({ where: { email } });
@@ -61,6 +61,7 @@ class CostumerController {
             address: user.address,
             phoneNumber: user.phoneNumber,
             statusOpen: user.statusOpen,
+            TalkJSID: `C-${user.id}`,
           };
           res.status(200).json({
             token,
@@ -146,4 +147,4 @@ class CostumerController {
   }
 }
 
-module.exports = CostumerController;
+module.exports = CustomerController;

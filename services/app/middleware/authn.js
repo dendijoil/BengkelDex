@@ -18,4 +18,4 @@ const authn = async (req, res, next) => {
   }
 };
 
-module.exports = { authn };
+module.exports = authn;

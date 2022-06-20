@@ -10,6 +10,10 @@ module.exports = {
       },
       WorkshopId: {
         type: Sequelize.INTEGER,
+        references: {
+          model: "Workshops",
+          key: "id",
+        },
       },
       name: {
         type: Sequelize.STRING,

@@ -1,54 +1,65 @@
-const {
-  Order,
-  OrderDetail,
-  sequelize,
-} = require("../models");
+const { Order, OrderDetail, sequelize } = require("../models");
 
 class OrderController {
   static async createOrder(req, res) {
-    const t = await sequelize.transaction();
+    // const t = await sequelize.transaction();
     try {
       const { WorkshopId } = req.params;
 
-      const [services] = req.body;
-
-      const newOrder = await Order.create(
-        {
-          UserId: req.user.id,
-          WorkshopId,
-          totalPrice: 0,
-          date: new Date(),
-          paymentStatus: false,
-          paymentType,
-        },
-        { transaction: t }
-      );
-        let totalPrice
-      services.forEach(el => {
-        const newOrderDetail = await OrderDetail.create({
-            OrderId: newOrder.id,
-            ServiceId: el.id,
-            price: el.price,
-        })
-        totalPrice += newServices.price
-      }, { transaction: t });
-
-      const finalOrder = await Order.update({
-        totalPrice,
-      }, {
-        where: {
-            id: newOrder.id,
-        },
-        transaction: t 
+      const { services, username } = req.body;
+      services.map((el) => {
+        el = JSON.stringify(el);
+        el = JSON.parse(el);
+        return el
       })
+      // const stringfied = JSON.stringify(services[0])
+      console.log(services)
+      // console.log(services[0], username);
 
-      await t.commit();
+      // const newOrder = await Order.create(
+      //   {
+      //     UserId: username,
+      //     WorkshopId,
+      //     totalPrice: 0,
+      //     date: new Date(),
+      //     paymentStatus: false,
+      //     paymentType,
+      //   },
+      //   { transaction: t }
+      // );
+      // let totalPrice;
+      // services.forEach(
+      //   async (el) => {
+      //     const newOrderDetail = await OrderDetail.create({
+      //       OrderId: newOrder.id,
+      //       ServiceId: el.id,
+      //       price: el.price,
+      //     });
+      //     totalPrice += newServices.price;
+      //   },
+      //   { transaction: t }
+      // );
+
+      // const finalOrder = await Order.update(
+      //   {
+      //     totalPrice,
+      //   },
+      //   {
+      //     where: {
+      //       id: newOrder.id,
+      //     },
+      //     transaction: t,
+      //   }
+      // );
+
+      // await t.commit();
 
       res.status(201).json({
-        message: "Success"
+        message: "Success",
       });
     } catch (error) {
-      t.rollback();
+      // t.rollback();
+      console.log(error)
       res.status(500).json(error);
     }
   }

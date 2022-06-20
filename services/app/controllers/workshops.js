@@ -34,7 +34,6 @@ class WorkshopController {
     try {
       const { email, password } = req.body;
       const workshop = await Workshop.findOne({ where: { email } });
-
       if (workshop) {
         const isPasswordCorrect = comparePassword(password, workshop.password);
         if (isPasswordCorrect) {
@@ -59,6 +58,7 @@ class WorkshopController {
             phoneNumber: workshop.phoneNumber,
             statusOpen: workshop.statusOpen,
             location: workshop.location,
+            TalkJSID: `W-${workshop.id}`,
           };
 
           res.status(200).json({
@@ -68,6 +68,8 @@ class WorkshopController {
         } else {
           res.status(401).json({ message: "Invalid username/password" });
         }
+      } else {
+        res.status(404).json({ message: "Workshop not found" });
       }
     } catch (error) {
       res.status(500).json(error);
