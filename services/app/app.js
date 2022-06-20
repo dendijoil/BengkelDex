@@ -11,5 +11,5 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/", router);
-
-app.listen(port, () => console.log(`This app is listening to port: ${port}`));
+module.exports = app
+// app.listen(port, () => console.log(`This app is listening to port: ${port}`));

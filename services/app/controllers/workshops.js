@@ -34,7 +34,6 @@ class WorkshopController {
     try {
       const { email, password } = req.body;
       const workshop = await Workshop.findOne({ where: { email } });
-
       if (workshop) {
         const isPasswordCorrect = comparePassword(password, workshop.password);
         if (isPasswordCorrect) {
@@ -70,6 +69,7 @@ class WorkshopController {
         }
       }
     } catch (error) {
+      console.log(error);
       res.status(500).json(error);
     }
   }
