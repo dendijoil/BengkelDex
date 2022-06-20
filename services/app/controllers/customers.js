@@ -63,6 +63,7 @@ class CustomerController {
             address: user.address,
             phoneNumber: user.phoneNumber,
             statusOpen: user.statusOpen,
+            TalkJSID: `C-${user.id}`,
           };
           res.status(200).json({
             token,

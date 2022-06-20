@@ -30,7 +30,7 @@ class WorkshopController {
     }
   }
 
-  static async loginWorkshop(req, res) {
+  static async loginWorkshop(req, res, next) {
     try {
       const { email, password } = req.body;
       const workshop = await Workshop.findOne({ where: { email } });
@@ -64,6 +64,7 @@ class WorkshopController {
             phoneNumber: workshop.phoneNumber,
             statusOpen: workshop.statusOpen,
             location: workshop.location,
+            TalkJSID: `W-${workshop.id}`,
           };
 
           res.status(200).json({
@@ -71,13 +72,15 @@ class WorkshopController {
             payload,
           });
         }
+      } else {
+        res.status(404).json({ message: "Workshop not found" });
       }
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
-  static async getWorkshopServices(req, res) {
+  static async getWorkshopServices(req, res, next) {
     try {
       const { WorkshopId } = req.params;
       const workshop = await Workshop.findOne({ where: { WorkshopId } });
@@ -85,11 +88,11 @@ class WorkshopController {
 
       res.status(200).json(services);
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
-  static async postServices(req, res) {
+  static async postServices(req, res, next) {
     try {
       const { WorkshopId } = req.params;
       const { name, description, price, isPromo } = req.body;
@@ -109,11 +112,11 @@ class WorkshopController {
         isPromo: newService.isPromo,
       });
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
-  static async updateStatus(req, res) {
+  static async updateStatus(req, res, next) {
     try {
       const { workshopId } = req.params;
       const { statusOpen } = req.body;
@@ -123,11 +126,11 @@ class WorkshopController {
         message: "Success updated statusOpen",
       });
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
-  static async getCustomersHelp(req, res) {
+  static async getCustomersHelp(req, res, next) {
     try {
       const userHelp = await User.findAll({
         where: {
@@ -136,7 +139,7 @@ class WorkshopController {
       });
       res.status(200).json(userHelp);
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 }

@@ -1,0 +1,56 @@
+[
+  {
+    "WorkshopId": 1,
+    "name": "Ganti oli",
+    "price": 70000,
+    "isPromo": false
+  },
+  {
+    "WorkshopId": 1,
+    "name": "Ganti ban",
+    "price": 50000,
+    "isPromo": false
+  },
+  {
+    "WorkshopId": 1,
+    "name": "Bersihkan mesin",
+    "price": 120000,
+    "isPromo": false
+  },
+  {
+    "WorkshopId": 2,
+    "name": "Ganti oli",
+    "price": 65000,
+    "isPromo": false
+  },
+  {
+    "WorkshopId": 2,
+    "name": "Ganti busi",
+    "price": 90000,
+    "isPromo": false
+  },
+  {
+    "WorkshopId": 2,
+    "name": "Turun mesin",
+    "price": 500000,
+    "isPromo": false
+  },
+  {
+    "WorkshopId": 3,
+    "name": "Service AC",
+    "price": 400000,
+    "isPromo": false
+  },
+  {
+    "WorkshopId": 3,
+    "name": "Tune-up karburator",
+    "price": 40000,
+    "isPromo": false
+  },
+  {
+    "WorkshopId": 3,
+    "name": "Ganti oli",
+    "price": 70000,
+    "isPromo": false
+  }
+]

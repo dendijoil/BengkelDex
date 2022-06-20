@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       Service.belongsTo(models.Workshop, {
         foreignKey: "WorkshopId",
       });
+      Service.hasOne(models.OrderDetail);
     }
   }
   Service.init(
