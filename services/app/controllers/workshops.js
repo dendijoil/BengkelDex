@@ -2,7 +2,7 @@
 const { hashPassword, comparePassword, generateToken } = require("../helpers");
 const { Workshop, Service, User } = require("../models");
 class WorkshopController {
-  static async registerWorkshop(req, res) {
+  static async registerWorkshop(req, res, next) {
     try {
       const { name, email, password, phoneNumber, address, longitude = 0, latitude = 0 } = req.body;
       const workshopLocation = {
@@ -26,7 +26,7 @@ class WorkshopController {
         balance: newWorkshop.balance,
       });
     } catch (error) {
-      res.status(500).json(error);
+      next(error);
     }
   }
 
@@ -34,9 +34,14 @@ class WorkshopController {
     try {
       const { email, password } = req.body;
       const workshop = await Workshop.findOne({ where: { email } });
-
+      if (!workshop) {
+        throw { name: "UserNotFound" };
+      }
       if (workshop) {
         const isPasswordCorrect = comparePassword(password, workshop.password);
+        if (!isPasswordCorrect) {
+          throw { name: "WrongPassword" };
+        }
         if (isPasswordCorrect) {
           const token = generateToken({
             id: workshop.id,
@@ -65,12 +70,10 @@ class WorkshopController {
             token,
             payload,
           });
-        } else {
-          res.status(401).json({ message: "Invalid username/password" });
         }
       }
     } catch (error) {
-      res.status(500).json(error);
+      next(error)
     }
   }
 
@@ -82,7 +85,7 @@ class WorkshopController {
 
       res.status(200).json(services);
     } catch (error) {
-      res.status(500).json(error);
+      next(error)
     }
   }
 
@@ -106,7 +109,7 @@ class WorkshopController {
         isPromo: newService.isPromo,
       });
     } catch (error) {
-      res.status(500).json(error);
+      next(error)
     }
   }
 
@@ -120,7 +123,7 @@ class WorkshopController {
         message: "Success updated statusOpen",
       });
     } catch (error) {
-      res.status(500).json(error);
+      next(error)
     }
   }
 
@@ -133,7 +136,7 @@ class WorkshopController {
       });
       res.status(200).json(userHelp);
     } catch (error) {
-      res.status(500).json(error);
+      next(error)
     }
   }
 }
