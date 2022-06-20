@@ -59,6 +59,7 @@ class CustomerController {
         balance: user.balance,
         address: user.address,
         statusOpen: user.statusOpen,
+        imgUrl: user.imgUrl,
         TalkJSID: `C-${user.id}`,
       };
       res.status(200).json({
@@ -128,7 +129,9 @@ class CustomerController {
           type: sequelize.QueryTypes.SELECT,
         }
       );
-
+      result.forEach(el => {
+        el.TalkJSID = `W-${el.id}`;
+      })
       res.status(200).json(result);
     } catch (error) {
       next(error);

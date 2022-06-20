@@ -6,6 +6,6 @@ const OrderController = require("../controllers/orders");
 router.use(authn);
 router.get("/", OrderController.getAllOrders);
 router.post("/:WorkshopId", OrderController.createOrder);
-router.get("/:OrderId", OrderController.getAllOrderDetails);
+router.get("/:OrderId", OrderController.getOrderDetailsById);
 
 module.exports = router;

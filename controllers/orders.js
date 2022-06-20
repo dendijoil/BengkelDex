@@ -88,19 +88,24 @@ class OrderController {
     }
   }
 
-  static async getAllOrderDetails(req, res, next) {
+  static async getOrderDetailsById(req, res, next) {
     try {
       const order = await Order.findOne({
         where: {
           id: req.params.OrderId,
         },
+        include: [
+          {
+            model: OrderDetail,
+            include: [
+              {
+                model: Service,
+              },
+            ],
+          },
+        ],
       });
-      const orderDetails = await OrderDetail.findAll({
-        where: {
-          OrderId: Order.id,
-        },
-      });
-      res.status(200).json(orderDetails);
+      res.status(200).json(order);
     } catch (error) {
       next(error);
     }

@@ -64,6 +64,7 @@ class WorkshopController {
         phoneNumber: workshop.phoneNumber,
         statusOpen: workshop.statusOpen,
         location: workshop.location,
+        imgUrl: workshop.imgUrl,
         TalkJSID: `W-${workshop.id}`,
       };
 
@@ -128,7 +129,7 @@ class WorkshopController {
 
   static async getCustomersHelp(req, res, next) {
     try {
-      const distance = req.query.distance || 100000;
+      const distance = req.query.distance || 2000;
       const long = req.query.long || -6.25881;
       const lat = req.query.lat || 106.82932;
 
@@ -158,7 +159,32 @@ class WorkshopController {
         }
       );
 
+      result.forEach(el => {
+        el.TalkJSID = `C-${el.id}`;
+      })
+
       res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getWorkshopDetail(req, res, next) {
+    try {
+      const { workshopId } = req.params;
+      const workshop = await Workshop.findOne({
+        where: {
+          id: workshopId,
+        },
+        include: [
+          {
+            model: Service,
+            as: "services",
+            attributes: ["id", "name", "description", "price", "isPromo"],
+          },
+        ],
+      });
+      res.status(200).json(workshop);
     } catch (error) {
       next(error);
     }
