@@ -1,0 +1,233 @@
+const request = require("supertest");
+const app = require("../app");
+const { Workshop, Sequelize, User } = require("../models");
+const jwt = require("jsonwebtoken");
+const { hashPassword } = require("../helpers");
+
+const user1 = {
+  name: "aldi",
+  email: "aldi@gmail.com",
+  password: "124567",
+  phoneNumber: 1234567,
+  address: "kelapa gading",
+  longitude: -6.25881,
+  latitude: 106.82932,
+
+};
+
+const user2 = {
+  name: 'user1',
+  username: "user",
+  password: "user",
+  imgUrl: 'https://static.republika.co.id/uploads/images/inpicture_slide/logo-mc-donald-_130605182712-898.jpg',
+  role: "user",
+  email: "user@email.com",
+  balance: 120000,
+  statusBroadcast: true,
+  address: "Bodjong Kenyot",
+  location: Sequelize.fn("ST_GeomFromText", `POINT(0 0)`),
+  createdAt: new Date(),
+  updatedAt: new Date(),
+}
+
+const workshopUser = {
+  name: "Bengkel2 Pakde Ucok",
+  email: "bengkelpakdeucok@email.com",
+  password: hashPassword("12345"),
+  statusOpen: false,
+  phoneNumber: "0812341234",
+  address: "Jl. Camar No.23, Pengasinan, Kec. Rawalumbu, Kota Bks, Jawa Barat 17115",
+  location: Sequelize.fn("ST_GeomFromText", `POINT(107.01203573614205 -6.273844613790287)`),
+  balance: 120000,
+  role: "staff",
+  createdAt: new Date(),
+  updatedAt: new Date()
+}
+
+beforeAll((done) => {
+  Workshop.create(workshopUser)
+  .then((registerUser) => {
+    return User.create(user2)
+  })
+  .then((registerWorkshop) => {
+    done()
+  })
+  .catch((err) => {
+    console.log(err);
+    done(err)
+  })
+});
+
+afterAll(done => {
+  Workshop.destroy({ truncate: true, cascade: true, restartIdentity: true})
+  .then(_ => {
+    return User.destroy({ truncate: true, cascade: true, restartIdentity: true})
+  })
+  .then(_ => {
+    done();
+  })
+  .catch(err => {
+    done(err);
+  });
+});
+
+describe("register workshop", () => {
+
+  test("register success with correct parameters", (done) => {
+    request(app)
+      .post("/workshops/register")
+      .send(user1)
+      .end(function (req, res, next) {
+        const { body, status } = res;
+        expect(status).toEqual(201);
+        expect(body).toEqual({ name: 'aldi', email: 'aldi@gmail.com', balance: 0 });
+        done();
+      });
+  });
+
+  test("should return 400 status code - should the email is empty", (done) => {
+    request(app)
+      .post("/workshops/register")
+      .send({
+        ...user1,
+        name: ''
+      })
+      .end(function (req, res, next) {
+        const { body, status } = res;
+        expect(status).toEqual(400);
+        expect(body.message).toEqual("Name is required");
+        done();
+      });
+  });
+
+  test("should return 400 status code - should the email is empty", (done) => {
+    request(app)
+      .post("/workshops/register")
+      .send({
+        ...user1,
+        email: 'aji'
+
+      })
+      .end(function (req, res, next) {
+        const { body, status } = res;
+        console.log(body.message, 'mesag');
+        expect(status).toEqual(400);
+        expect(body.message).toEqual("Email is invalid");
+        done();
+      });
+  });
+
+  // test("should return 401 status code - should the password is empty", (done) => {
+  //   request(app)
+  //     .post("/workshops/register")
+  //     .send({
+  //       ...user1,
+  //       email: 'adisusanto@gmail.com',
+  //       password: ''
+  //     })
+  //     .end(function (req, res, next) {
+  //       const { body, status } = res;
+  //       console.log(body.message, 'mesag');
+  //       expect(status).toEqual(400);
+  //       expect(body.message).toEqual("Password is required");
+  //       done();
+  //     });
+  // });
+
+  test("should return 401 status code - should the email is empty", (done) => {
+    request(app)
+      .post("/workshops/register")
+      .send({
+        ...user1,
+      })
+      .end(function (req, res, next) {
+        const { body, status } = res;
+        console.log(body.message, 'mesag');
+        expect(status).toEqual(400);
+        expect(body.message).toEqual("email must be unique");
+        done();
+      });
+  });
+
+});
+
+describe('login feature', () => {
+
+  test('success login', (done) => {
+    request(app)
+    .post('/workshops/login')
+    .send({
+      email: user1.email,
+      password: user1.password,
+    })
+    .end(function(req, res, next) {
+      const { body, status } = res;
+      expect(status).toEqual(200)
+      expect(body.token).toEqual(expect.any(String))
+      expect(body.payload).toEqual(expect.any(Object))
+      done()
+    })
+  })
+
+  test('wrong password login', (done) => {
+    request(app)
+    .post('/workshops/login')
+    .send({
+      email: 'aldi@gmail.com',
+      password: "12456788",
+    })
+    .end(function(req, res, next) {
+      const { body, status } = res;
+      expect(status).toEqual(401)
+      expect(body.message).toEqual('Invalid username or password')
+      done()
+    })
+  })
+})
+
+describe('status open workshops feature', () => {
+  test('200 Success update - should status open workshops updated', (done) => {
+    request(app)
+    .patch('/workshops/1')
+    .send({
+      statusOpen: true,
+    })
+    .end(function(req, res, next) {
+      const { body, status } = res;
+      expect(status).toEqual(200)
+      expect(body.message).toEqual('Success updated status')
+      done()
+    })
+  })
+})
+
+// describe('get Customers Help feature', () => {
+//   test('200 Success get user - should get all customer when their statusBroadcast true ', (done) => {
+//     request(app)
+//     .get('/workshops/need-help')
+//     .end(function(req, res, next) {
+//       const { body, status } = res;
+//       expect(status).toEqual(200)
+//       expect(body).toEqual(expect.any(Array))
+//       // expect(body.message).toEqual('Success updated statusOpen')
+//       done()
+//     })
+//   })
+// })
+
+// describe('add services', () => {
+//   test.only('201 Success add services - should workshop add services', (done) => {
+//     request(app)
+//     .post('/services/1')
+//     .send({
+//       name: 'ganti oli',
+//       description: ''
+//     })
+//     .end(function(req, res, next) {
+//       const { body, status } = res;
+//       expect(status).toEqual(200)
+//       expect(body.message).toEqual('Success updated statusOpen')
+//       done()
+//     })
+//   })
+// })
