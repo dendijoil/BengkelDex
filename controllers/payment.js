@@ -1,4 +1,7 @@
 const { Order, Workshop, User, sequelize } = require("../models");
+const snap = require("../services/midtrans/index");
+const axios = require("axios");
+
 class PaymentController {
   static async doPayment(req, res, next) {
     const t = await sequelize.transaction();
@@ -81,9 +84,8 @@ class PaymentController {
           gross_amount: req.body.amount,
         },
         customer_details: {
-          first_name: req.user?.fullName.split(" ")[0],
-          last_name: req.user?.fullName.split(" ")[1],
-          email: req.user?.email,
+          name: req.user.name,
+          username: req.user.username,
           phone: "+6281023928095",
         },
         enabled_payments: [
@@ -122,23 +124,37 @@ class PaymentController {
         },
       };
 
-      const transaction = await snap.createTransaction(parameter);
+      // const transaction = await snap.createTransaction(parameter);
 
-      await User.update(
-        { balance: req.user.balance + req.body.amount },
-        {
-          where: {
-            id: req.user.id,
-          },
-        }
-      );
+      const { data } = await axios({
+        method: "post",
+        url: "https://app.sandbox.midtrans.com/snap/v1/transactions",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: "Basic U0ItTWlkLXNlcnZlci1zZWRQRVRrUGZBRlp0WEgycHc2RUp0eHo6",
+        },
+        data: parameter,
+      });
+
+      console.log(data);
+
+      // await User.update(
+      //   { balance: req.user.balance + req.body.amount },
+      //   {
+      //     where: {
+      //       id: req.user.id,
+      //     },
+      //   }
+      // );
 
       // kayaknya disini ada yang kurang sempurna, kurang paymentStatus
       res.status(200).json({
-        token: transaction.token,
-        redirect_url: transaction.redirect_url,
+        token: data.token,
+        redirect_url: data.redirect_url,
       });
     } catch (err) {
+      console.log(err);
       next(err);
     }
   }
