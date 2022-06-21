@@ -1,4 +1,5 @@
 "use strict";
+const { hashPassword } = require("../helpers/index.js");
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Workshop extends Model {
@@ -30,11 +31,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         unique: true,
         validate: {
-          isEmail: {
-            msg: "Email is invalid",
-          },
           notEmpty: {
             msg: "Email is required",
+          },
+          isEmail: {
+            msg: "Email is invalid",
           },
         },
       },
@@ -60,5 +61,10 @@ module.exports = (sequelize, DataTypes) => {
       modelName: "Workshop",
     }
   );
+
+  Workshop.beforeCreate((workshop, options) => {
+    workshop.password = hashPassword(workshop.password);
+    return workshop;
+  });
   return Workshop;
 };
