@@ -13,6 +13,7 @@ const authn = async (req, res, next) => {
       username: foundUser.username,
       name: foundUser.name,
       balance: foundUser.balance,
+      phoneNumber: foundUser.phoneNumber,
     };
     next();
   } catch (err) {

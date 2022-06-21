@@ -77,7 +77,7 @@ class PaymentController {
       if (error) {
         throw err;
       }
-
+      let inputAmount = +req.body.amount;
       let parameter = {
         transaction_details: {
           order_id: "BengkelDex_" + Math.floor(Math.random() * 1000000),
@@ -86,26 +86,25 @@ class PaymentController {
         customer_details: {
           name: req.user.name,
           username: req.user.username,
-          phone: "+6281023928095",
+          phone: req.user.phoneNumber,
         },
-        enabled_payments: [
-          "credit_card",
-          "cimb_clicks",
-          "bca_klikbca",
-          "bca_klikpay",
-          "bri_epay",
-          "echannel",
-          "permata_va",
-          "bca_va",
-          "bni_va",
-          "bri_va",
-          "other_va",
-          "gopay",
-          "indomaret",
-          "danamon_online",
-          "akulaku",
-          "shopeepay",
-        ],
+        enabled_payments: 
+        ["credit_card", 
+        "cimb_clicks", 
+        "bca_klikbca", 
+        "bca_klikpay", 
+        "bri_epay", 
+        "echannel", 
+        "permata_va", 
+        "bca_va", 
+        "bni_va", 
+        "bri_va", 
+        "other_va",
+        "gopay", 
+        "indomaret", 
+        "danamon_online", 
+        "akulaku", 
+        "shopeepay"],
         credit_card: {
           secure: true,
           channel: "migs",
@@ -126,29 +125,29 @@ class PaymentController {
 
       // const transaction = await snap.createTransaction(parameter);
 
-      const { data } = await axios({
+      let { data } = await axios({
         method: "post",
         url: "https://app.sandbox.midtrans.com/snap/v1/transactions",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          Authorization: "Basic U0ItTWlkLXNlcnZlci1zZWRQRVRrUGZBRlp0WEgycHc2RUp0eHo6",
+          // Authorization: "Basic U0ItTWlkLXNlcnZlci1zZWRQRVRrUGZBRlp0WEgycHc2RUp0eHo6",
+          Authorization: "Basic U0ItTWlkLXNlcnZlci1zZWRQRVRrUGZBRlp0WEgycHc2RUp0eHo=:",
         },
         data: parameter,
       });
 
       console.log(data);
-
-      // await User.update(
-      //   { balance: req.user.balance + req.body.amount },
-      //   {
-      //     where: {
-      //       id: req.user.id,
-      //     },
-      //   }
-      // );
-
-      // kayaknya disini ada yang kurang sempurna, kurang paymentStatus
+      if (data) {
+        await User.update(
+          { balance: +req.user.balance + inputAmount },
+          {
+            where: {
+              id: req.user.id,
+            },
+          }
+        );
+      }
       res.status(200).json({
         token: data.token,
         redirect_url: data.redirect_url,
