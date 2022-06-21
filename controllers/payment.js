@@ -88,23 +88,24 @@ class PaymentController {
           username: req.user.username,
           phone: req.user.phoneNumber,
         },
-        enabled_payments: 
-        ["credit_card", 
-        "cimb_clicks", 
-        "bca_klikbca", 
-        "bca_klikpay", 
-        "bri_epay", 
-        "echannel", 
-        "permata_va", 
-        "bca_va", 
-        "bni_va", 
-        "bri_va", 
-        "other_va",
-        "gopay", 
-        "indomaret", 
-        "danamon_online", 
-        "akulaku", 
-        "shopeepay"],
+        enabled_payments: [
+          "credit_card",
+          "cimb_clicks",
+          "bca_klikbca",
+          "bca_klikpay",
+          "bri_epay",
+          "echannel",
+          "permata_va",
+          "bca_va",
+          "bni_va",
+          "bri_va",
+          "other_va",
+          "gopay",
+          "indomaret",
+          "danamon_online",
+          "akulaku",
+          "shopeepay",
+        ],
         credit_card: {
           secure: true,
           channel: "migs",
@@ -137,24 +138,35 @@ class PaymentController {
         data: parameter,
       });
 
-      console.log(data);
-      if (data) {
-        await User.update(
-          { balance: +req.user.balance + inputAmount },
-          {
-            where: {
-              id: req.user.id,
-            },
-          }
-        );
-      }
+      req.inputAmount = inputAmount;
+
       res.status(200).json({
         token: data.token,
         redirect_url: data.redirect_url,
+        inputAmount,
       });
     } catch (err) {
       console.log(err);
       next(err);
+    }
+  }
+
+  static async updateBalance(req, res, next) {
+    try {
+      const inputAmount = req.inputAmount;
+      await User.update(
+        { balance: +req.user.balance + inputAmount },
+        {
+          where: {
+            id: req.user.id,
+          },
+        }
+      );
+
+      res.status(200).json({ message: "Success" });
+    } catch (error) {
+      console.log(error);
+      next(error);
     }
   }
 }
