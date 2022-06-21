@@ -12,7 +12,7 @@ class WorkshopController {
       const newWorkshop = await Workshop.create({
         name,
         email,
-        password: hashPassword(password),
+        password,
         phoneNumber,
         statusOpen: false,
         role: "staff",
@@ -80,8 +80,8 @@ class WorkshopController {
 
   static async getWorkshopServices(req, res, next) {
     try {
-      const { WorkshopId } = req.params;
-      const workshop = await Workshop.findOne({ where: { WorkshopId } });
+      const { WorkshopId } = +req.params;
+      const workshop = await Workshop.findByPk(WorkshopId);
       const services = await Service.findAll({ where: { WorkshopId: workshop.id } });
 
       res.status(200).json(services);
@@ -93,19 +93,17 @@ class WorkshopController {
   static async postServices(req, res, next) {
     try {
       const { WorkshopId } = req.params;
-      const { name, description, price, isPromo } = req.body;
+      const { name, price, isPromo } = req.body;
 
       const newService = await Service.create({
         WorkshopId,
         name,
-        description,
         price,
         isPromo,
       });
 
       res.status(201).json({
         name: newService.name,
-        description: newService.description,
         price: newService.price,
         isPromo: newService.isPromo,
       });
