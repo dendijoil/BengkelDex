@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Order.hasMany(models.OrderDetail);
       this.belongsTo(models.User);
+      this.belongsTo(models.Workshop);
     }
   }
   Order.init(

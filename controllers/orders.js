@@ -78,7 +78,7 @@ class OrderController {
     try {
       const orders = await Order.findAll({
         where: {
-          WorkshopId : req.user.id, // UserID dari model User yang login
+          WorkshopId: req.user.id, // UserID dari model User yang login
         },
         include: [
           {
@@ -87,8 +87,9 @@ class OrderController {
           {
             model: User,
             attributes: ["name", "username", "email", "imgUrl", "address", "phoneNumber"],
-          }
-        ]
+          },
+        ],
+        order: [["date", "DESC"]],
       });
       res.status(200).json(orders);
     } catch (error) {
@@ -111,10 +112,19 @@ class OrderController {
               },
             ],
           },
+          {
+            model: User,
+            attributes: ["name", "username", "email", "imgUrl", "address", "phoneNumber"],
+          },
+          {
+            model: Workshop,
+            attributes: ["name", "imgUrl", "address", "phoneNumber"],
+          },
         ],
       });
       res.status(200).json(order);
     } catch (error) {
+      console.log(error);
       next(error);
     }
   }

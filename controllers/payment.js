@@ -72,16 +72,12 @@ class PaymentController {
 
   static async topUpBalance(req, res, next) {
     try {
-      const { error } = req.body;
-      if (error) {
-        throw err;
-      }
       let inputAmount = +req.body.amount;
       let parameter = {
         transaction_details: {
           order_id: "BengkelDex_" + Math.floor(Math.random() * 1000000) + `_${req.user.username}`,
           user_username: req.user.username,
-          gross_amount: req.body.amount,
+          gross_amount: Number(req.body.amount),
         },
         customer_details: {
           name: req.user.name,
@@ -138,6 +134,8 @@ class PaymentController {
         data: parameter,
       });
 
+      console.log(data);
+
       req.inputAmount = inputAmount;
 
       res.status(200).json({
@@ -146,6 +144,7 @@ class PaymentController {
         inputAmount,
       });
     } catch (err) {
+      console.log(err.response.data);
       next(err);
     }
   }
@@ -153,17 +152,18 @@ class PaymentController {
   static async updateBalance(req, res, next) {
     try {
       const inputAmount = req.inputAmount;
+      console.log(req.body);
       let { transaction_status, order_id, gross_amount } = req.body;
       const orderData = order_id.split("_");
 
       const username = orderData[2];
-      if (transaction_status === "settlement") {
-
+      console.log(username);
+      if (transaction_status === "settlement" || transaction_status === "capture") {
         const user = await User.findOne({
           where: {
-            username
-          }
-        })
+            username,
+          },
+        });
 
         await User.update(
           { balance: user.balance + Number(gross_amount) },
