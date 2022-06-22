@@ -72,6 +72,7 @@ class PaymentController {
   }
 
   static async topUpBalance(req, res, next) {
+    console.log(req.body);
     try {
       const { error } = req.body;
       if (error) {
