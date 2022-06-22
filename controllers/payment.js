@@ -65,7 +65,7 @@ class PaymentController {
         message: "Success",
       });
     } catch (error) {
-      console.log(error);
+      console.log(error, 'errooooorrrrrrr');
       t.rollback();
       next(error);
     }

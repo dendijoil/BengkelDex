@@ -11,10 +11,11 @@ const handlingError = (err, req, res, next) => {
   } else if (err.name === "WrongPassword") {
     code = 401;
     msg = "Invalid username or password";
-  } else if (err.name === "UserNotFound") {
-    code = 404;
-    msg = "User not found";
+  } else if(err.name == 'JsonWebTokenError') {
+    code = 401
+    msg = 'invalid token'
   }
+
 
   res.status(code).json({
     statusCode: code,

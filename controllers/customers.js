@@ -68,7 +68,6 @@ class CustomerController {
         payload,
       });
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }

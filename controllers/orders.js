@@ -40,7 +40,6 @@ class OrderController {
         { transaction: t }
       );
 
-      console.log(selectedServices);
       let orderDetail = [];
 
       selectedServices.forEach((service) => {
