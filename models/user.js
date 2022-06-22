@@ -34,12 +34,12 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         unique: true,
         validate: {
-          isEmail: {
-            msg: "Email is invalid",
-          },
           notEmpty: {
             msg: "Email is required",
           },
+          isEmail: {
+            msg: "Email is invalid",
+          }
         },
       },
       password: {

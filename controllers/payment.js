@@ -65,20 +65,17 @@ class PaymentController {
         message: "Success",
       });
     } catch (error) {
-      console.log(error);
       t.rollback();
       next(error);
     }
   }
 
   static async topUpBalance(req, res, next) {
-    console.log(req.body);
     try {
       const { error } = req.body;
       if (error) {
         throw err;
       }
-      console.log(req.user.username);
       let inputAmount = +req.body.amount;
       let parameter = {
         transaction_details: {
@@ -149,14 +146,12 @@ class PaymentController {
         inputAmount,
       });
     } catch (err) {
-      console.log(err);
       next(err);
     }
   }
 
   static async updateBalance(req, res, next) {
     try {
-      console.log(req.body, "TEST");
       const inputAmount = req.inputAmount;
       let { transaction_status, order_id, gross_amount } = req.body;
       const orderData = order_id.split("_");
@@ -181,7 +176,6 @@ class PaymentController {
       }
       res.status(200).json({ message: "Success" });
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
