@@ -80,9 +80,8 @@ class WorkshopController {
 
   static async getWorkshopServices(req, res, next) {
     try {
-      const { WorkshopId } = +req.params;
-      const workshop = await Workshop.findByPk(WorkshopId);
-      const services = await Service.findAll({ where: { WorkshopId: workshop.id } });
+      console.log(req.params.id)
+      const services = await Service.findAll({ where: { WorkshopId: req.params.WorkshopId } });
 
       res.status(200).json(services);
     } catch (error) {

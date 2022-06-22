@@ -10,11 +10,11 @@ function comparePassword(password, hash) {
 }
 
 function generateToken(user) {
-  return jwt.sign(user, process.env.JWT_SECRET);
+  return jwt.sign(user, "thisisarealshit");
 }
 
 function verifyToken(token) {
-  return jwt.verify(token, process.env.JWT_SECRET);
+  return jwt.verify(token, "thisisarealshit");
 }
 
 module.exports = {

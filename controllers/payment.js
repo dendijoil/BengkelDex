@@ -7,13 +7,14 @@ class PaymentController {
     const t = await sequelize.transaction();
     try {
       const { OrderId } = req.params;
-      //! INGAT, PAKE QUERY!
       const { WorkshopId, UserId } = req.query;
+      console.log(UserId,"<<<<<<<<<<<<<<<")
 
       const order = await Order.findByPk(OrderId, { transaction: t });
       if (order.paymentType === "cash") {
         await Order.update(
           {
+            UserId: UserId,
             paymentStatus: true,
           },
           {
@@ -26,7 +27,8 @@ class PaymentController {
       } else {
         const user = await User.findByPk(UserId, { transaction: t });
         const userBalance = await User.update(
-          { balance: user.balance - order.totalPrice },
+          { 
+            balance: user.balance - order.totalPrice },
           {
             where: {
               id: UserId,
@@ -50,6 +52,7 @@ class PaymentController {
 
         const updateStatus = await Order.update(
           {
+            UserId,
             paymentStatus: true,
           },
           {

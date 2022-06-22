@@ -7,25 +7,15 @@ class OrderController {
     try {
       const { WorkshopId } = req.params;
 
-      const { services, username, paymentType } = req.body;
-
-      const user = await User.findOne(
-        {
-          where: {
-            username,
-          },
-        },
-        { transaction: t }
-      );
+      const { services } = req.body;
 
       const newOrder = await Order.create(
         {
-          UserId: user.id,
           WorkshopId,
           totalPrice: 0,
           date: new Date(),
           paymentStatus: false,
-          paymentType,
+          paymentType: "balance",
         },
         { transaction: t }
       );
@@ -79,7 +69,7 @@ class OrderController {
     try {
       const orders = await Order.findAll({
         where: {
-          UserId: req.user.id, // UserID dari model User yang login
+          WorkshopId: req.user.id, // UserID dari model User yang login
         },
         include: [
           {
