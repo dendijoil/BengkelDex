@@ -77,10 +77,12 @@ class PaymentController {
       if (error) {
         throw err;
       }
+      console.log(req.user.username);
       let inputAmount = +req.body.amount;
       let parameter = {
         transaction_details: {
-          order_id: "BengkelDex_" + Math.floor(Math.random() * 1000000),
+          order_id: "BengkelDex_" + Math.floor(Math.random() * 1000000) + `_${req.user.username}`,
+          user_username: req.user.username,
           gross_amount: req.body.amount,
         },
         customer_details: {
@@ -153,16 +155,29 @@ class PaymentController {
 
   static async updateBalance(req, res, next) {
     try {
+      console.log(req.body, "TEST");
       const inputAmount = req.inputAmount;
-      await User.update(
-        { balance: +req.user.balance + inputAmount },
-        {
-          where: {
-            id: req.user.id,
-          },
-        }
-      );
+      let { transaction_status, order_id, gross_amount } = req.body;
+      const orderData = order_id.split("_");
 
+      const username = orderData[2];
+      if (transaction_status === "settlement") {
+
+        const user = await User.findOne({
+          where: {
+            username
+          }
+        })
+
+        await User.update(
+          { balance: user.balance + Number(gross_amount) },
+          {
+            where: {
+              username,
+            },
+          }
+        );
+      }
       res.status(200).json({ message: "Success" });
     } catch (error) {
       console.log(error);
