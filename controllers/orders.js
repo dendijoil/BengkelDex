@@ -81,6 +81,15 @@ class OrderController {
         where: {
           UserId: req.user.id, // UserID dari model User yang login
         },
+        include: [
+          {
+            model: OrderDetail,
+          },
+          {
+            model: User,
+            attributes: ["name", "username", "email", "imgUrl", "address", "phoneNumber"],
+          }
+        ]
       });
       res.status(200).json(orders);
     } catch (error) {
