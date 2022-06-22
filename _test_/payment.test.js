@@ -119,10 +119,108 @@ describe("POST /payment/:OrderId", () => {
     })
   })
 
+  // test('500', (done) => {
+  //   request(app)
+  //   .post('/payment/1000?WorkshopId=1&UserId=1')
+  //   .set("access_token", access_token)
+  //   .end(function(err, res) {
+  //     if(err) {
+  //       return done(err)
+  //     }
+  //     const { body, status } = res;
+  //     console.log(body,'bodyyyya');
+  //     console.log(status, 'statussssa');
+  //     expect(status).toEqual(500)
+  //     // expect(body).toEqual('Success')
+
+  //     done()
+  //   })
+  // })
+
   test('should return 500 status code - should the internal server error', (done) => {
     request(app)
     .post('/payment/abc')
     .set("access_token", access_token)
+    .end(function(err, res) {
+      if(err) {
+        return done(err)
+      }
+      const { body, status } = res;
+      expect(status).toEqual(500)
+      expect(body.message).toEqual('Internal server error')
+      done()
+    })
+  })
+ })
+
+ describe("POST /payment/top-up", () => { 
+  test('200 Success top-up - should customer top-up balance', (done) => {
+    request(app)
+    .post('/payment/top-up')
+    .set("access_token", access_token)
+    .send({
+      amount: '60000',
+    })
+    .end(function(err, res) {
+      if(err) {
+        return done(err)
+      }
+      const { body, status } = res;
+      expect(status).toEqual(200)
+      expect(body.token).toEqual(expect.any(String))
+      expect(body.redirect_url).toEqual(expect.any(String))
+      expect(body.inputAmount).toEqual(expect.any(Number))
+      done()
+    })
+  })
+
+  test('should return 500 status code - should the internal server error', (done) => {
+    request(app)
+    .post('/payment/top-up')
+    .set("access_token", access_token)
+    .send({
+      amount: 'abc',
+    })
+    .end(function(err, res) {
+      if(err) {
+        return done(err)
+      }
+      const { body, status } = res;
+      expect(status).toEqual(500)
+      expect(body.message).toEqual('Internal server error')
+      done()
+    })
+  })
+ })
+
+ describe("POST /top-up/update-balance", () => { 
+  test('200 Success update balance - should customer update balance', (done) => {
+    request(app)
+    .post('/payment/top-up/update-balance')
+    .send({
+      transaction_status: 'settlement',
+      order_id:'BengkelDex_12345_budi2',
+      gross_amount: '6000'
+    })
+    .end(function(err, res) {
+      if(err) {
+        return done(err)
+      }
+      const { body, status } = res;
+      expect(status).toEqual(200)
+      expect(body.message).toEqual('Success')
+      done()
+    })
+  })
+
+  test('should return 500 status code - should the internal server error', (done) => {
+    request(app)
+    .post('/payment/top-up/update-balance')
+    .send({
+      transaction_status: 'settlement',
+      order_id:'BengkelDex_12345_budi2',
+      gross_amount: 'abc'
+    })
     .end(function(err, res) {
       if(err) {
         return done(err)

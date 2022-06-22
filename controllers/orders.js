@@ -92,7 +92,7 @@ class OrderController {
       });
       res.status(200).json(orders);
     } catch (error) {
-      next(error);
+      // next(error);
     }
   }
 

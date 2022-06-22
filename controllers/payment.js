@@ -72,10 +72,6 @@ class PaymentController {
 
   static async topUpBalance(req, res, next) {
     try {
-      const { error } = req.body;
-      if (error) {
-        throw err;
-      }
       let inputAmount = +req.body.amount;
       let parameter = {
         transaction_details: {
