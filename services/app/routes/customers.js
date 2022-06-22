@@ -7,5 +7,5 @@ router.post("/register", CustomerController.register);
 router.post("/login", CustomerController.loginCustumer);
 router.use(authn);
 router.patch("/broadcast", CustomerController.updateBroadcast);
-router.get('/workshops', CustomerController.findWorkshopByRadius);
+router.get('/near-workshops', CustomerController.findWorkshopByRadius);
 module.exports = router;
