@@ -79,7 +79,7 @@ class OrderController {
     try {
       const orders = await Order.findAll({
         where: {
-          UserId: req.user.id, // UserID dari model User yang login
+          WorkshopId : req.user.id, // UserID dari model User yang login
         },
         include: [
           {
