@@ -101,7 +101,7 @@ class CustomerController {
 
   static async findWorkshopByRadius(req, res, next) {
     try {
-      const distance = req.query.distance || 2000;
+      const distance = req.query.distance || 20000000000;
       const long = req.query.long || -6.25881;
       const lat = req.query.lat || 106.82932;
 
