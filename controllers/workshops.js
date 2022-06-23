@@ -93,7 +93,7 @@ class WorkshopController {
   static async postServices(req, res, next) {
     try {
       const { WorkshopId } = req.params;
-      const { name, price, isPromo } = req.body;
+      const { name, price, isPromo = false } = req.body;
 
       const newService = await Service.create({
         WorkshopId,
@@ -108,6 +108,7 @@ class WorkshopController {
         isPromo: newService.isPromo,
       });
     } catch (error) {
+      console.log(error)
       next(error);
     }
   }
